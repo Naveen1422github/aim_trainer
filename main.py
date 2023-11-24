@@ -65,7 +65,7 @@ if start_button :
             energy = np.sum(np.square(indata[:, 0]))
 
             # Check if the energy exceeds the threshold
-            if not clap_detected and energy > 2:
+            if not clap_detected and energy > 5:
                 print("CLAPPED!")
                 clap_detected = True
                 clap_index = len(path)  # Set the clap index to the current path length
