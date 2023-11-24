@@ -1,6 +1,4 @@
-import cv2
-import ffmpeg
-import subprocess
+import cv2 
 import numpy as np
 import streamlit as st
 import threading
@@ -27,7 +25,7 @@ start_button = st.button("start processing")
           # streamlit functioning
 
           
-
+          
 if start_button :
     print("start")
 
