@@ -1,7 +1,7 @@
-portaudio
+
 numpy
 opencv-python-headless
 sounddevice
 streamlit
-
+portaudio
 
