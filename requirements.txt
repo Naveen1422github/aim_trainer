@@ -1,4 +1,5 @@
-numpy
+numpy==1.25.2
 opencv-python-headless
-sounddevice
-streamlit
+sounddevice==0.4.6
+streamlit==1.28.2
+
