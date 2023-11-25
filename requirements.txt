@@ -3,4 +3,5 @@ opencv-python-headless
 sounddevice==0.4.6
 streamlit==1.28.2
 pyaudio
+portaudio
 
