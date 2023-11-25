@@ -1,7 +1,6 @@
+
 numpy==1.25.2
-opencv-python-headless
+opencv_python==4.8.1.78
 sounddevice==0.4.6
 streamlit==1.28.2
-pyaudio
-
 
