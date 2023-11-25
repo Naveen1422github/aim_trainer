@@ -1,4 +1,4 @@
-
+portaudio
 numpy
 opencv-python-headless
 sounddevice
