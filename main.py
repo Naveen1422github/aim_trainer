@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import streamlit as st
 import threading
+import sounddevice as sd
 from geometry_utils import calculate_distance_and_angle
 from visualization import draw_path, log_pink_circle_coordinates, update_pink_circle_coordinates, save_series_shots, calculate_score, calculate_aim_trace_speed, calculate_inside_ring_avg
 from log_utils import log_distance_angle
