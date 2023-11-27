@@ -1,5 +1,5 @@
-aiortc
 numpy
+sounddevice
 opencv-python-headless
 streamlit
 
