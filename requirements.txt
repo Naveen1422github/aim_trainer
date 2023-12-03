@@ -1,6 +1,6 @@
 numpy
 sounddevice
-opencv-python-headless
+opencv-python
 streamlit
 
 
