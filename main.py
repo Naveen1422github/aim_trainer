@@ -1,5 +1,6 @@
 import cv2 
 import numpy as np
+import pandas as pd
 import streamlit as st
 import threading
 import sounddevice as sd
@@ -106,12 +107,14 @@ if start_button :
                 pass  # Allow the user to interrupt the function with Ctrl+C
 
 
+    img_container = st.empty()
+    stats = st.empty()
 
-
-    for run_num in range(1):  # Set the number of runs here
+    
+    for run_num in range(2):  # Set the number of runs here
 
         # Read the video
-        video = cv2.VideoCapture('Test_Videos/video-test-4.mp4')
+        video = cv2.VideoCapture('Test_Videos/video-test-3.mp4')
         frame_rate = int(video.get(cv2.CAP_PROP_FPS))
         video.set(cv2.CAP_PROP_FPS, frame_rate)
 
@@ -135,8 +138,6 @@ if start_button :
         # Select ROI
         bbox = cv2.selectROI(resized_frame)
 
-#streamlit        
-        st.write(bbox)
         start_point = (bbox[0] + bbox[2] // 2, bbox[1] + bbox[3] // 2)
 
         # Start the clap detection in a separate thread
@@ -165,22 +166,17 @@ if start_button :
 
 
         # Define the codec and create a video writer object for frame tracking
-        fourcc_tracking = cv2.VideoWriter_fourcc(*'XVID')
-        out_tracking = cv2.VideoWriter(f'Output/frame_tracking_{run_num}.avi', fourcc_tracking, frame_rate, (resized_frame.shape[1], resized_frame.shape[0]))
+        fourcc_tracking = cv2.VideoWriter_fourcc(*'H264')
+        out_tracking = cv2.VideoWriter(f'Output/frame_tracking_{run_num}.mp4', fourcc_tracking, frame_rate, (resized_frame.shape[1], resized_frame.shape[0]))
 
         # Define the codec and create a video writer object for path visualization
-        fourcc_path = cv2.VideoWriter_fourcc(*'XVID')
-        out_path = cv2.VideoWriter(f'Output/path_visualization_{run_num}.avi', fourcc_path, frame_rate, (path_visualization.shape[1], path_visualization.shape[0]))
-
+        fourcc_path = cv2.VideoWriter_fourcc(*'H264')
+        out_path = cv2.VideoWriter(f'Output/path_visualization_{run_num}.mp4', fourcc_path, frame_rate, (path_visualization.shape[1], path_visualization.shape[0]))
+                            
         # Define the log file name
         log_filename = f'Output/distance_angle_log_{run_num}.csv'
     
     
-#image container for stream lit pathvisualization
-        col1, col2 = st.columns(2)
-        img_container1 = st.empty()
-        img_container2 = st.empty()
-        txt_container = st.write("hey what i'm doing ")
 
         while True:
             ok, frame = video.read()
@@ -261,22 +257,19 @@ if start_button :
             else:
                 cv2.putText(resized_frame, 'Error', (100, 0), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 
-            with col1:
-                img_container1.image(resized_frame, channels="BGR")
+            with img_container:
+                row1 , row2 = st.columns(2)
                 
-            with col2:
-                img_container2.image(path_visualization, channels="BGR")
+                with row1:
+                   st.image(resized_frame, channels="BGR")
+
+                with row2:
+                    st.image(path_visualization, channels="BGR")
             
             if cv2.waitKey(1) & 0xFF == 27:
                 break
 
 # line break
-        st.image('Output/series_shots.png')
-
-        with open("Output/pink_circle_coordinates.log", "r") as f:
-            file_contents = f.read()
-            st.write(file_contents)
-         
 
         st.write("---")
 
@@ -297,6 +290,36 @@ if start_button :
         cv2.destroyAllWindows()
 
 
-    log_pink_circle_coordinates('Output/pink_circle_coordinates.log', pink_circle_coordinates,background_image, scores, aim_time, inside_ring, aim_trace_speed, aim_trace_speed2, inside_ring_avg)
-    final_bg = np.copy(background_image)
-    save_series_shots(pink_circle_coordinates, final_bg)
+        log_pink_circle_coordinates('Output/pink_circle_coordinates.csv', pink_circle_coordinates,background_image, scores, aim_time, inside_ring, aim_trace_speed, aim_trace_speed2, inside_ring_avg)
+        final_bg = np.copy(background_image)
+        save_series_shots(pink_circle_coordinates, final_bg)
+        
+        
+    
+    df = pd.read_csv(r'Output\pink_circle_coordinates.csv')
+    
+    with stats:
+        tab, video, image1, image2 = st.columns(4)
+    
+        with tab:
+            st.table(df)
+
+        with video:
+            for index, row in df.iterrows():
+                video_path = f"Output/path_visualization_{index}.mp4"
+                button_label = f"Play Video {index + 1}"
+
+                if st.button(button_label, key=f"button_{index}"):
+                    # Store the selected video path in a SessionState variable
+                    st.session_state.selected_video_path = video_path
+
+        with image1:
+            # Display the selected video in the image1 column
+            selected_video_path = getattr(st.session_state, 'selected_video_path', None)
+            if selected_video_path:
+                st.video(selected_video_path)
+            else:
+                st.image('Output/series_shots.png')
+    
+        with image2:
+            st.image('Output/series_shots.png')

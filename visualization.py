@@ -52,12 +52,12 @@ def log_pink_circle_coordinates(filename, coordinates, background_image, scores,
     mean_x = int(np.mean([c[0] for c in coordinates]))
     mean_y = int(np.mean([c[1] for c in coordinates]))
     distances = [np.sqrt((c[0] - mean_x)**2 + (c[1] - mean_y)**2) for c in coordinates]
-    
+
     with open(filename, 'w') as file:
         file.write("Index,X,Y,Direction,Score,Aim Time,10.0,S1,S2,DA,10a.0\n")
         for index, (coord, score, at, ten, SOne, STwo, distance, tenA) in enumerate(zip(coordinates, scores, aim_time, inside_ring, aim_trace_speed, aim_trace_speed2, distances, inside_ring_avg)):
             direction = calculate_direction(coord, (background_image.shape[1] // 2, background_image.shape[0] // 2))  # Assuming center is defined
-            file.write(f"{index + 1},{coord[0]},{coord[1]},{direction},{score},{at},{ten},{SOne},{STwo},{distance},{tenA}\n")
+            file.write(f"{index + 1},{coord[0]},{coord[1]},{direction},{score},{round(at,1)},{round(ten,1)},{round(SOne,1)},{round(STwo,1)},{round(distance,1)},{round(tenA,1)}\n")
 
 def calculate_inside_ring_avg(coordinates, path):
     mean_x = int(np.mean([c[0] for c in coordinates]))
@@ -123,7 +123,7 @@ def calculate_score(scores, pink_circle_center, background_image_shape):
     center_x, center_y = background_image_shape[0] // 2, background_image_shape[1] // 2
     distance_from_center = np.sqrt((pink_circle_center[0] - center_x)**2 + (pink_circle_center[1] - center_y)**2)
     print(distance_from_center)
-
+    
     # Define radius ranges
     radius_ranges = [
         (0, 6),
@@ -162,7 +162,7 @@ def save_series_shots(pink_circle_coordinates, shot_image, output_folder='Output
 
     # Draw a gray plus sign at the mean position
     plus_size = 20
-    plus_color = (128, 128, 128)  # Gray color
+    plus_color = (128, 255, 128)  # Gray color
     cv2.line(shot_image, (mean_x - plus_size, mean_y), (mean_x + plus_size, mean_y), plus_color, 2)
     cv2.line(shot_image, (mean_x, mean_y - plus_size), (mean_x, mean_y + plus_size), plus_color, 2)
 
@@ -185,11 +185,6 @@ def save_series_shots(pink_circle_coordinates, shot_image, output_folder='Output
         text_size = cv2.getTextSize(index_text, font, font_scale, font_thickness)[0]
         text_position = (coord[0] - text_size[0] // 2, coord[1] + text_size[1] // 2)
         cv2.putText(shot_image, index_text, text_position, font, font_scale, font_color, font_thickness)
-
-    # Display the resulting image
-    cv2.imshow('Series Shots', shot_image)
-    cv2.waitKey(0)  # Wait until any key is pressed
-    cv2.destroyAllWindows()
 
     # Save the shot image
     shot_filename = f'{output_folder}/series_shots.png'
